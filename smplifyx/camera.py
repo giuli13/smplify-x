@@ -41,7 +41,7 @@ def create_camera(camera_type='persp', **kwargs):
 
 class PerspectiveCamera(nn.Module):
 
-    FOCAL_LENGTH = 5000
+    FOCAL_LENGTH = 500
 
     def __init__(self, rotation=None, translation=None,
                  focal_length_x=None, focal_length_y=None,

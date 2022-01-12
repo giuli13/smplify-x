@@ -19,6 +19,7 @@ from __future__ import absolute_import
 from __future__ import print_function
 from __future__ import division
 
+import json
 
 import time
 try:
@@ -494,8 +495,22 @@ def fit_single_frame(img,
                                          dtype=body_pose.dtype,
                                          device=body_pose.device)
                 body_pose = torch.cat([body_pose, wrist_pose], dim=1)
+        
+        model_output = body_model(return_verts=True, body_pose=body_pose, return_full_pose = True)
+        mesh_results = {"body_pose" : (model_output.body_pose.data.cpu().numpy()[0]).tolist(),
+                    "left_hand_pose" : (model_output.left_hand_pose.data.cpu().numpy()[0]).tolist(),
+                    "right_hand_pose" : (model_output.left_hand_pose.data.cpu().numpy()[0]).tolist(),
+                    "expression" : (model_output.expression.data.cpu().numpy()[0]).tolist()
+                        }
+        folder_name = result_fn.split('/')[8]
+        mesh_path = "/home/giuliamartinelli/Documents/Code/smplify-x/output/SMPLX_params"
+        mesh_folder = os.path.join(mesh_path,folder_name)
+        if not osp.exists(mesh_folder):
+            os.makedirs(mesh_folder)
+        all_mesh_path =  os.path.join(mesh_folder,"00.json")
+        with open(all_mesh_path, 'w') as f:
+            json.dump(mesh_results, f)
 
-        model_output = body_model(return_verts=True, body_pose=body_pose)
         vertices = model_output.vertices.detach().cpu().numpy().squeeze()
 
         import trimesh
